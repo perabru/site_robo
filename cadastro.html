@@ -1,0 +1,348 @@
+
+<html>
+   
+    <head>
+          <title>UNIVAP CTI</title>
+        
+            <style>
+        table {
+            width: 300px;
+            font: 17px Calibri;
+        }
+        table,
+        th,
+        td {
+            border: solid 1px #DDD;
+            border-collapse: collapse;
+            padding: 2px 3px;
+            text-align: center;
+        }
+    </style>
+             <!-- Script CSS online para dar uma beleza ao site -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+          <meta charset="utf-8">
+    </head>
+
+    
+    <body>
+    
+     <!-- Script Ajax necessÃ¡rio para poder criar a tabela -->
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js" type="text/javascript"></script>
+    
+     <div class="container">
+            
+            <h2>Upload de tarefa</h2>
+            <br>
+            <center><img src="novas_imagens/logo.png" width="300" height="300"></center>
+            <br><br>
+         
+   
+    
+         
+           
+         <br>
+            <!-- INICIO DO FORMULARIO -->
+            <label>Nome da Equipe:</label> <br>
+            <input id="nomeEquipe"/> <br>
+
+            <label>Nome Membro 1 (Capitão):</label> <br>
+            <input id="nomeM1"/> <br>
+            <label>E-mail do Capitão: </label> <br>
+            <input id="email"/>  <br>
+            <label>Nome Membro 2:</label> <br>
+            <input id="nomeM2"/> <br>
+            <label>Nome Membro 3:</label> <br>
+            <input id="nomeM3"/> <br>
+            <label>Nome Membro 4:</label> <br>
+            <input id="nomeM4"/> <br>
+            <label>Nome Membro 5:</label> <br>
+            <input id="nomeM5"/> <br>
+            <label>Nome Membro 6:</label> <br>
+            <input id="nomeM6"/> <br>
+
+
+
+
+            <br> <label>Turma: </label><br>
+            <select id="selecao">
+                <option>-----------</option>
+                <option>1ºA</option>
+				<option>1ºF</option>
+			    <option>1ºH</option>               
+                <option>1ºI</option>
+                <option>1ºJ</option>
+				
+               
+            </select>
+       <!--  <br>
+            <label>Mensagem: </label><br>
+            <textarea rows="4" cols="50" value="" id="mensagem"></textarea><br><br>
+             
+      Fim do formulario-->     
+
+       <br>   
+              <!--   <label>Progresso:</label>
+       <progress value="0" max="100" id="uploader">0%</progress>
+         <br>
+       
+       <br>
+      <input type="file" value="upload" id="fileButton"/>
+         
+       <br>
+       <label id="lblPath"></label>
+       <br>-->
+         
+          <button type="button" onclick="inserir()" id="btnCadastrar" class="btn btn-success">Enviar</button>      
+         <button type="button" class="btn btn-default" onclick="location.href ='index.html';">Home</button>
+          <button type="button"  onclick="buscaGeral()" id="btnBuscaGeral"class="btn btn-primary">Busca Tarefas</button>
+          <br><br>
+    
+        
+              <br><br><br>
+            <table style="width:100%" id="myTable" >
+                <tr>
+                    <th>Data</th>
+                    <th>Nome da Equipe</th>
+                    <th>Membro 1 Capitão</th>
+                    <th>E-mail Capitão</th>
+                    <th>Membro 2</th>
+                    <th>Membro 3</th>
+                    <th>Membro 4</th>
+                    <th>Membro 5</th>
+                    <th>Membro 6</th>
+                </tr>
+            
+            
+                <tbody id="table_body">
+            
+                        
+                </tbody>
+           </table>
+        <br><br><br>
+        
+        
+          <script src="https://www.gstatic.com/firebasejs/5.5.6/firebase.js"></script>
+     
+       
+       
+       
+       
+       <script>
+         // Initialize Firebase  https://www.youtube.com/watch?v=SpxHVrpfGgU
+         var config = {
+           apiKey: "AIzaSyBHpTarLHzV8m0IcAEhUo17rAg95TsJib4",
+           authDomain: "mynotawesome-f750f.firebaseapp.com",
+           databaseURL: "https://mynotawesome-f750f.firebaseio.com",
+           projectId: "mynotawesome-f750f",
+           storageBucket: "mynotawesome-f750f.appspot.com",
+           messagingSenderId: "607163714508"
+         };
+         firebase.initializeApp(config);
+           
+        
+           var uploader = document.getElementById('uploader');
+           var fileButton = document.getElementById('fileButton');
+           
+           
+     
+             
+         
+           
+        document.getElementById("myTable").style.visibility = "hidden";
+
+           
+           fileButton.addEventListener('change', function (e){
+               
+              //pega o arquivo
+               var file = e.target.files[0];
+               //cria referencia
+               var storageRed = firebase.storage().ref('tarefa/'+file.name);
+               
+               //upload file
+              var task =  storageRed.put(file);
+               
+               
+               //atualizar barra
+               task.on('state_changed',
+                      function progress(snapshot){
+                   
+                   var percentage = (snapshot.bytesTransferred / snapshot.totalBytes)*100;
+                   
+                   uploader.value = percentage;
+				   
+				    if(percentage == 100){
+                       document.getElementById("btnCadastrar").disabled = false;
+                   }
+                   
+                   
+                
+               },
+                       
+                       function error (err){
+                    alert('Erro: '+err.toString());
+                   
+               },
+                       function complete(){
+                   
+                   task.snapshot.ref.getDownloadURL().then(function(downloadURL) {
+                        console.log('File available at', downloadURL);
+                       document.getElementById("lblPath").innerHTML = downloadURL.toString();
+                       //colocando a imagem do banco
+                       //document.getElementById("myImage").src=  downloadURL.toString();
+                       
+                
+                   });
+                   
+               }
+           );
+                    
+                       
+         
+           });
+           
+           
+           
+ //Referenciando o banco de dados
+ var refCadastro = firebase.database().ref("cadastro");
+
+
+
+
+
+
+
+ //---------------------------------------------------------Inicio da funÃ§Ã£o selecionar
+ function inserir() {
+
+     
+     
+     
+     //Variaveis para pegar as informaÃ§Ãµes da pÃ¡gina HTML
+     var txtNomeEquipe = document.getElementById("nomeEquipe").value;
+     var txtNomeCapitao = document.getElementById("nomeM1").value;
+     var txtNomeM2 = document.getElementById("nomeM2").value;
+     var txtNomeM3 = document.getElementById("nomeM3").value;
+     var txtNomeM4 = document.getElementById("nomeM4").value;
+     var txtNomeM5 = document.getElementById("nomeM5").value;
+     var txtNomeM6 = document.getElementById("nomeM6").value;
+     var txtEmail = document.getElementById("email").value;
+     var txtTurma = document.getElementById("selecao").value;
+     
+   
+           //------------------------data
+                var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth()+1; //January is 0!
+        var yyyy = today.getFullYear();
+
+        if(dd<10) {
+            dd = '0'+dd
+        } 
+
+        if(mm<10) {
+            mm = '0'+mm
+        } 
+
+        today = dd + '/' + mm + '/' + yyyy;
+
+     
+     
+   
+           
+           
+           //-------------------------
+     
+     
+   
+  
+     //---------------------------------------------
+     //Insere os dados no banco
+   
+             var resultado = refCadastro.push({
+                nomeEquipe: txtNomeEquipe,
+                nomeCapitao: txtNomeCapitao,
+                nomeM2: txtNomeM2,
+                nomeM3: txtNomeM3,
+                nomeM4: txtNomeM4,
+                nomeM5: txtNomeM5,
+                nomeM6: txtNomeM6,
+                eMail: txtEmail,
+                turma: txtTurma,
+                data: today
+
+                 
+             });
+     
+
+  
+   alert("Mensagem enviada!");
+    window.location.reload();
+ }
+//---------------------------------------------------------Fimda funÃ§Ã£o selecionar
+
+//---------------------------------------------------------Inicio da funÃ§Ã£o Busca Geral
+function buscaGeral(){
+  
+  //----------------------------senha
+    
+    var txt;
+    var senha = prompt("Ð’Ð²ÐµÐ´Ð¸Ñ‚Ðµ Ñ‚Ð¾ÐºÐµÐ½ Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐºÐ¸:","");
+    if(senha==null|| senha ==""){
+        txt="UsuÃ¡rio cancelou.";
+    }else {
+        var senhaC = btoa(senha);
+        if(senhaC == "YnJ1bm8xMTIzNTg="){
+                      
+               //Procura por todos os nÃ³s em busca das informaÃ§Ãµes requisitadas.
+    refCadastro.on("child_added", snap=>{
+        
+        //Receendo os valores jÃ¡ adicionados no banco de dados
+        
+        //var id = snap.key;
+        
+        var nomeEquipe = snap.child("nomeEquipe").val();
+        var nomeCap = snap.child("nomeCapitao").val();
+        var nomeM2 = snap.child("nomeM2").val();
+        var nomeM3 = snap.child("nomeM3").val();
+        var nomeM4 = snap.child("nomeM4").val();
+        var nomeM5 = snap.child("nomeM5").val();
+        var nomeM6 = snap.child("nomeM6").val();
+        var email = snap.child("email").val();
+        
+          
+         var escola =snap.child("escola").val();
+        var data =snap.child("data").val();
+        var txtTurma = snap.child("turma").val();
+     
+        if(snap.child("escola").val() == "UNIVAP"){
+        
+     
+        //Adiciona tudo em uma tabela
+         $('#table_body').append("<tr><td>"+ data+"</td><td>"+ nomeEquipe + "</td><td>" + nomeCap +"</td><td>" +email+"</td><td>"+nomeM2+"</td><td>"+nomeM3 +"</td></tr>");
+        }
+    });
+    
+    
+    document.getElementById("myTable").style.visibility = "visible";
+}
+           
+        }
+        
+        
+    }
+    
+    
+//----------------------------------------
+    
+    
+    
+           
+           
+           
+           
+            </script>
+        </div>
+    </body>
+
+
+</html>
